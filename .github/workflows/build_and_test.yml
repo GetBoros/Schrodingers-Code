@@ -1,0 +1,37 @@
+# .github/workflows/build_and_test.yml
+
+name: CMake Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Скачиваем код из репозитория
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Создаем директорию для сборки
+      - name: Create build directory
+        run: cmake -E make_directory ${{github.workspace}}/build
+
+      # 3. Конфигурируем CMake
+      # Этот шаг сгенерирует Makefile или другие сборочные файлы в папке build
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -S ${{github.workspace}}
+
+      # 4. Собираем проект
+      # CMake сам вызовет компилятор (g++) и соберет ваш исполняемый файл
+      - name: Build project
+        run: cmake --build ${{github.workspace}}/build
+
+      # 5. Запускаем тест (наш исполняемый файл)
+      # Исполняемый файл будет лежать в папке build, его имя - TEMP
+      - name: Run test
+        run: ${{github.workspace}}/build/TEMP
