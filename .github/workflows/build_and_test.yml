@@ -1,6 +1,4 @@
-# .github/workflows/build_and_test.yml
-
-name: CMake Build and Test
+name: CMake Cross-Platform Build
 
 on:
   push:
@@ -10,28 +8,46 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Используем матрицу, чтобы запустить эту задачу на разных ОС
+    strategy:
+      matrix:
+        # Здесь мы перечисляем все операционные системы, на которых хотим провести сборку
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    # ${ matrix.os } будет заменена на ubuntu-latest, windows-latest и т.д. для каждого запуска
+    runs-on: ${{ matrix.os }}
 
     steps:
-      # 1. Скачиваем код из репозитория
+      # 1. Скачиваем код (одинаково для всех)
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Создаем директорию для сборки
+      # 2. Создаем директорию для сборки (одинаково для всех)
       - name: Create build directory
         run: cmake -E make_directory ${{github.workspace}}/build
 
-      # 3. Конфигурируем CMake
-      # Этот шаг сгенерирует Makefile или другие сборочные файлы в папке build
-      - name: Configure CMake
+      # 3. Конфигурируем CMake (шаг зависит от ОС)
+      # Для Windows мы будем использовать генератор Visual Studio,
+      # для Linux и macOS - стандартный Makefile
+      - name: Configure CMake (Windows)
+        if: runner.os == 'Windows'
+        run: cmake -B ${{github.workspace}}/build -S ${{github.workspace}} -G "Visual Studio 17 2022"
+      
+      - name: Configure CMake (Linux & macOS)
+        if: runner.os != 'Windows'
         run: cmake -B ${{github.workspace}}/build -S ${{github.workspace}}
 
-      # 4. Собираем проект
-      # CMake сам вызовет компилятор (g++) и соберет ваш исполняемый файл
+      # 4. Собираем проект (одинаково для всех)
       - name: Build project
         run: cmake --build ${{github.workspace}}/build
 
-      # 5. Запускаем тест (наш исполняемый файл)
-      # Исполняемый файл будет лежать в папке build, его имя - TEMP
-      - name: Run test
-        run: ${{github.workspace}}/build/TEMP
+      # 5. Запускаем тест (путь к исполняемому файлу зависит от ОС и генератора)
+      # В Windows, Visual Studio по умолчанию создает подпапку Debug
+      - name: Run test (Windows)
+        if: runner.os == 'Windows'
+        run: ${{github.workspace}}/build/Debug/ASchrodingers_Code.exe
+      
+      # В Linux и macOS исполняемый файл будет лежать прямо в папке build
+      - name: Run test (Linux & macOS)
+        if: runner.os != 'Windows'
+        run: ${{github.workspace}}/build/ASchrodingers_Code
