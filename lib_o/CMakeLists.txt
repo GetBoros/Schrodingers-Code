@@ -7,3 +7,5 @@ add_library(ALibrary STATIC src/lib.cpp)  # Create a static library
 #-------------------------------------------------------------------------------------------------------------
 target_include_directories(ALibrary PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)  # include directory library
 #-------------------------------------------------------------------------------------------------------------
+target_precompile_headers(ALibrary PRIVATE src/pch.h)  # Precompiled headers
+#-------------------------------------------------------------------------------------------------------------

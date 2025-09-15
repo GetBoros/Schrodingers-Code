@@ -1,4 +1,6 @@
-name: CMake Cross-Platform Build
+# .github/workflows/build_and_test.yml
+
+name: Build and Test
 
 on:
   push:
@@ -8,46 +10,61 @@ on:
 
 jobs:
   build:
-    # Используем матрицу, чтобы запустить эту задачу на разных ОС
     strategy:
       matrix:
-        # Здесь мы перечисляем все операционные системы, на которых хотим провести сборку
         os: [ubuntu-latest, windows-latest, macos-latest]
 
-    # ${ matrix.os } будет заменена на ubuntu-latest, windows-latest и т.д. для каждого запуска
     runs-on: ${{ matrix.os }}
 
     steps:
-      # 1. Скачиваем код (одинаково для всех)
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      # 2. Создаем директорию для сборки (одинаково для всех)
-      - name: Create build directory
-        run: cmake -E make_directory ${{github.workspace}}/build
+    # --- Установка зависимостей ---
 
-      # 3. Конфигурируем CMake (шаг зависит от ОС)
-      # Для Windows мы будем использовать генератор Visual Studio,
-      # для Linux и macOS - стандартный Makefile
-      - name: Configure CMake (Windows)
-        if: runner.os == 'Windows'
-        run: cmake -B ${{github.workspace}}/build -S ${{github.workspace}} -G "Visual Studio 17 2022"
-      
-      - name: Configure CMake (Linux & macOS)
-        if: runner.os != 'Windows'
-        run: cmake -B ${{github.workspace}}/build -S ${{github.workspace}}
+    - name: Set up C++ compiler (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++-14 ninja-build
+      # Примечание: g++-14 уже должен быть доступен в ubuntu-latest из PPA,
+      # но явная установка надежнее. Ninja ставится из стандартных репозиториев.
 
-      # 4. Собираем проект (одинаково для всех)
-      - name: Build project
-        run: cmake --build ${{github.workspace}}/build
+    - name: Set up C++ compiler (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install ninja
+      # Clang, который идет с Xcode, будет использован по умолчанию.
 
-      # 5. Запускаем тест (путь к исполняемому файлу зависит от ОС и генератора)
-      # В Windows, Visual Studio по умолчанию создает подпапку Debug
-      - name: Run test (Windows)
-        if: runner.os == 'Windows'
-        run: ${{github.workspace}}/build/app/Debug/AApplication.exe
-      
-      # В Linux и macOS исполняемый файл будет лежать прямо в папке build
-      - name: Run test (Linux & macOS)
-        if: runner.os != 'Windows'
-        run: ${{github.workspace}}/build/app/AApplication
+    - name: Set up C++ compiler (Windows)
+      if: runner.os == 'Windows'
+      # MSVC, идущий с windows-latest, будет использован по умолчанию.
+      # Установим Ninja через pip.
+      run: pip install ninja
+
+    # --- Конфигурация и сборка CMake ---
+
+    - name: Configure CMake (Linux)
+      if: runner.os == 'Linux'
+      run: >
+        cmake -B build -G Ninja
+        -DCMAKE_C_COMPILER=gcc-14
+        -DCMAKE_CXX_COMPILER=g++-14
+
+    - name: Configure CMake (non-Linux)
+      if: runner.os != 'Linux'
+      run: cmake -B build -G Ninja
+
+    - name: Build project
+      run: cmake --build build --config Release -- -j $(nproc || sysctl -n hw.ncpu || echo 2)
+      # Используем nproc (Linux), sysctl (macOS) или фолбэк на 2 ядра для параллельной сборки
+
+    # --- Тестирование (пока просто запуск) ---
+
+    - name: Run application (Linux/macOS)
+      if: runner.os != 'Windows'
+      run: ./build/app/AApplication
+
+    - name: Run application (Windows)
+      if: runner.os == 'Windows'
+      run: ./build/app/AApplication.exe
