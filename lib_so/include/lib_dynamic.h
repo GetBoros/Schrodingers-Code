@@ -1,0 +1,13 @@
+#pragma once
+
+#if defined(_WIN32)
+    #if defined(BUILDING_LIB_DYNAMIC)
+        #define LIB_DYNAMIC_API __declspec(dllexport)
+    #else
+        #define LIB_DYNAMIC_API __declspec(dllimport)
+    #endif
+#else
+    #define LIB_DYNAMIC_API
+#endif
+
+LIB_DYNAMIC_API void Func_From_Lib_Dynamic();
