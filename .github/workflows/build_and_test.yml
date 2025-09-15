@@ -45,9 +45,9 @@ jobs:
       # В Windows, Visual Studio по умолчанию создает подпапку Debug
       - name: Run test (Windows)
         if: runner.os == 'Windows'
-        run: ${{github.workspace}}/build/Debug/ASchrodingers_Code.exe
+        run: ${{github.workspace}}/build/app/Debug/AApplication.exe
       
       # В Linux и macOS исполняемый файл будет лежать прямо в папке build
       - name: Run test (Linux & macOS)
         if: runner.os != 'Windows'
-        run: ${{github.workspace}}/build/ASchrodingers_Code
+        run: ${{github.workspace}}/build/app/AApplication
