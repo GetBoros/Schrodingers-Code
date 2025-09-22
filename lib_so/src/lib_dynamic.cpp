@@ -1,7 +1,6 @@
 //------------------------------------------------------------------------------------------------------------
 #include "pch.h"
 //------------------------------------------------------------------------------------------------------------
-
 //------------------------------------------------------------------------------------------------------------
 struct STask
 {
@@ -15,13 +14,41 @@ struct STask
         std::suspend_always final_suspend() noexcept { return {}; };
 
         void unhandled_exception() { std::terminate(); };
-        void return_void() { };
+        
+        std::suspend_always yield_value(int value) { Current_Value = value; return {}; };
+        void return_value(int value) { Current_Value = value; }; // or return_void
+
+        int Current_Value;
     };
 
     std::coroutine_handle<promise_type> Coroutine_Handle;
 
+    STask() : Coroutine_Handle(0) { };
     explicit STask(std::coroutine_handle<promise_type> handle) : Coroutine_Handle(handle) { };
     ~STask() { if (Coroutine_Handle) { Coroutine_Handle.destroy(); } };
+    STask(const STask &) = delete;
+    STask &operator=(const STask &) = delete;
+    STask(STask &&other) noexcept : Coroutine_Handle(other.Coroutine_Handle)
+    {
+        other.Coroutine_Handle = 0;
+    }
+    STask &operator=(STask &&other) noexcept
+    {
+        if (this == &other)
+            return *this;
+
+        if (Coroutine_Handle)
+        {
+            Coroutine_Handle.destroy();
+        }
+
+        Coroutine_Handle = other.Coroutine_Handle;
+        other.Coroutine_Handle = nullptr;
+
+        return *this;
+    }
+
+    int Get_Value() { return Coroutine_Handle.promise().Current_Value; };
 };
 //------------------------------------------------------------------------------------------------------------
 struct SAwaiter_Sleep
@@ -45,15 +72,21 @@ SAwaiter_Sleep Sleep_For(std::chrono::seconds duration)
     return SAwaiter_Sleep{ duration };
 }
 //------------------------------------------------------------------------------------------------------------
-STask My_Task()
+STask My_Task(std::function<void(int)> on_progress)
 {
-    std::cout << "Короутина: началась." << std::endl;
+    co_await Sleep_For(std::chrono::seconds(1) );
+    on_progress(1);
 
     co_await Sleep_For(std::chrono::seconds(1) );
-    
-    std::cout << "Короутина: завершилась после ожидания." << std::endl;
-    
-    co_return;
+    on_progress(2);
+
+    co_await Sleep_For(std::chrono::seconds(1) );
+    on_progress(3);
+
+    co_await Sleep_For(std::chrono::seconds(1) );
+    on_progress(4);
+
+    co_return 42;  // make some func to save our data
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -63,20 +96,23 @@ STask My_Task()
 // Main
 LIB_DYNAMIC_API void Func_Lib_Dynamic()
 {
-    std::cout << "main: запускаем короутину.\n";
+    int result;
+    STask *task;
 
-    STask task = My_Task();
+    auto show_progress = [](int progress) { std::cout << "main:  -> Tusk index done: " << progress << std::endl; };
 
-    std::cout << "main: короутина запущена, но еще не завершена.\n";
-    std::cout << "main: ждем завершения..." << std::endl;
+    task = new STask(My_Task(show_progress) );
 
-    using namespace std::chrono_literals;
+    std::this_thread::sleep_for(std::chrono::seconds(5) );
 
-    std::this_thread::sleep_for(2s);
+    result = task->Get_Value();
 
-    std::cout << "main: программа завершается." << std::endl;
+    delete task;
 }
 //------------------------------------------------------------------------------------------------------------
+
+
+
 
 //------------------------------------------------------------------------------------------------------------
 #pragma region MY_TASK
