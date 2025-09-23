@@ -1,92 +1,37 @@
 //------------------------------------------------------------------------------------------------------------
 #include "pch.h"
 //------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------
-struct STask
-{
-    struct promise_type
-    {
-        STask get_return_object()
-        {
-            return STask{ std::coroutine_handle<promise_type>::from_promise(*this) };
-        };
-        std::suspend_never initial_suspend() { return {}; };
-        std::suspend_always final_suspend() noexcept { return {}; };
-
-        void unhandled_exception() { std::terminate(); };
-        
-        std::suspend_always yield_value(int value) { Current_Value = value; return {}; };
-        void return_value(int value) { Current_Value = value; }; // or return_void
-
-        int Current_Value;
-    };
-
-    std::coroutine_handle<promise_type> Coroutine_Handle;
-
-    STask() : Coroutine_Handle(0) { };
-    explicit STask(std::coroutine_handle<promise_type> handle) : Coroutine_Handle(handle) { };
-    ~STask() { if (Coroutine_Handle) { Coroutine_Handle.destroy(); } };
-    STask(const STask &) = delete;
-    STask &operator=(const STask &) = delete;
-    STask(STask &&other) noexcept : Coroutine_Handle(other.Coroutine_Handle)
-    {
-        other.Coroutine_Handle = 0;
-    }
-    STask &operator=(STask &&other) noexcept
-    {
-        if (this == &other)
-            return *this;
-
-        if (Coroutine_Handle)
-        {
-            Coroutine_Handle.destroy();
-        }
-
-        Coroutine_Handle = other.Coroutine_Handle;
-        other.Coroutine_Handle = nullptr;
-
-        return *this;
-    }
-
-    int Get_Value() { return Coroutine_Handle.promise().Current_Value; };
-};
-//------------------------------------------------------------------------------------------------------------
-struct SAwaiter_Sleep
+struct STask_Awaiter
 {
     std::chrono::seconds Duration;
 
     bool await_ready() const noexcept { return false; };
     void await_suspend(std::coroutine_handle<> handle) const
     {
-        std::cout << "Awaiter: засыпаем на " << Duration.count() << " сек. в await_suspend\n";
-        std::this_thread::sleep_for(Duration);
-        std::cout << "Awaiter: проснулись, возобновляем короутину.\n";
-
-        handle.resume();
+        std::cout << "await_suspend: Короутина заморожена. Управление возвращается...\n";
     };
     void await_resume() const noexcept { };
 };
 //------------------------------------------------------------------------------------------------------------
-SAwaiter_Sleep Sleep_For(std::chrono::seconds duration)
+
+
+
+
+//------------------------------------------------------------------------------------------------------------
+STask_Awaiter STask_Awaiter_Func()
 {
-    return SAwaiter_Sleep{ duration };
+    return STask_Awaiter{ std::chrono::seconds(1) };
 }
 //------------------------------------------------------------------------------------------------------------
-STask My_Task(std::function<void(int)> on_progress)
+ATask Custom_Task(void(*func_callback)() )
 {
-    co_await Sleep_For(std::chrono::seconds(1) );
-    on_progress(1);
+    func_callback();
+    co_await STask_Awaiter_Func();
 
-    co_await Sleep_For(std::chrono::seconds(1) );
-    on_progress(2);
-
-    co_await Sleep_For(std::chrono::seconds(1) );
-    on_progress(3);
-
-    co_await Sleep_For(std::chrono::seconds(1) );
-    on_progress(4);
-
-    co_return 42;  // make some func to save our data
+    func_callback();
+    co_await STask_Awaiter_Func();
+    
+    co_return 36;
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -96,18 +41,13 @@ STask My_Task(std::function<void(int)> on_progress)
 // Main
 LIB_DYNAMIC_API void Func_Lib_Dynamic()
 {
-    int result;
-    STask *task;
+    ATask Task;
+    auto callback_lambda = [](){ std::cout << "Hello World\n"; };
 
-    auto show_progress = [](int progress) { std::cout << "main:  -> Tusk index done: " << progress << std::endl; };
+    Task = Custom_Task(callback_lambda);
+    Task.Coroutine_Handle.resume();  // Do just once co_await
 
-    task = new STask(My_Task(show_progress) );
-
-    std::this_thread::sleep_for(std::chrono::seconds(5) );
-
-    result = task->Get_Value();
-
-    delete task;
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 }
 //------------------------------------------------------------------------------------------------------------
 
