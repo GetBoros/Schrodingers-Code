@@ -67,4 +67,5 @@ jobs:
 
     - name: Run application (Windows)
       if: runner.os == 'Windows'
+      timeout-minutes: 5 # Set an explicit timeout of 5 minutes
       run: ./build/app/AApplication.exe

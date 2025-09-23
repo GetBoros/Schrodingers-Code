@@ -7,7 +7,10 @@
 #include <chrono>
 #include <coroutine>
 #include <thread>
+#include <functional>
+#include <condition_variable>
 //------------------------------------------------------------------------------------------------------------
 #include "lib_dynamic.h"
 #include "Task.h"
+#include "Task_Manager.h"
 //------------------------------------------------------------------------------------------------------------

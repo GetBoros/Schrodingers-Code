@@ -3,12 +3,14 @@
 //------------------------------------------------------------------------------------------------------------
 struct STask_Awaiter
 {
-    std::chrono::seconds Duration;
+    int Duration;
+    void (*Func_To_Excecute)();
 
     bool await_ready() const noexcept { return false; };
     void await_suspend(std::coroutine_handle<> handle) const
     {
-        std::cout << "await_suspend: Короутина заморожена. Управление возвращается...\n";
+        Func_To_Excecute();
+        std::this_thread::sleep_for(std::chrono::seconds(Duration) );
     };
     void await_resume() const noexcept { };
 };
@@ -17,21 +19,19 @@ struct STask_Awaiter
 
 
 
-//------------------------------------------------------------------------------------------------------------
-STask_Awaiter STask_Awaiter_Func()
-{
-    return STask_Awaiter{ std::chrono::seconds(1) };
-}
-//------------------------------------------------------------------------------------------------------------
-ATask Custom_Task(void(*func_callback)() )
-{
-    func_callback();
-    co_await STask_Awaiter_Func();
 
-    func_callback();
-    co_await STask_Awaiter_Func();
+//------------------------------------------------------------------------------------------------------------
+ATask Custom_Task(STask_Awaiter(*func_callback)() )
+{
+    co_await func_callback();
+    co_await func_callback();
     
     co_return 36;
+}
+//------------------------------------------------------------------------------------------------------------
+void Func()
+{
+
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -41,13 +41,63 @@ ATask Custom_Task(void(*func_callback)() )
 // Main
 LIB_DYNAMIC_API void Func_Lib_Dynamic()
 {
-    ATask Task;
-    auto callback_lambda = [](){ std::cout << "Hello World\n"; };
+    
+    // std::cout << "[Main] Программа стартовала.\n";
+    // // Первый вызов Get_Instance() создаст менеджер и запустит воркер.
+    // AsTask_Manager& manager = AsTask_Manager::Get_Instance();
 
-    Task = Custom_Task(callback_lambda);
-    Task.Coroutine_Handle.resume();  // Do just once co_await
+    // // --- Создаем наши "тяжелые" задачи ---
+    // auto task1 = []() {
+    //     std::cout << "    (Task 1) Начал работу...\n";
+    //     std::this_thread::sleep_for(std::chrono::seconds(2));
+    //     std::cout << "    (Task 1) ...Закончил работу.\n";
+    // };
 
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // auto task2 = []() {
+    //     std::cout << "    (Task 2) Начал работу...\n";
+    //     std::this_thread::sleep_for(std::chrono::seconds(3));
+    //     std::cout << "    (Task 2) ...Закончил работу.\n";
+    // };
+
+    // auto task3 = []() {
+    //     std::cout << "    (Task 3) Начал работу...\n";
+    //     std::this_thread::sleep_for(std::chrono::seconds(1));
+    //     std::cout << "    (Task 3) ...Закончил работу.\n";
+    // };
+
+    // // --- Отправляем их в менеджер ---
+    // manager.Submit_Task(task1);
+    // manager.Submit_Task(task2);
+    // manager.Submit_Task(task3);
+
+    // std::cout << "[Main] Все задачи отправлены. Main поток может заниматься своими делами.\n";
+    // std::cout << "[Main] Например, поспать 1 секунду.\n";
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
+    // std::cout << "[Main] Main поток проснулся.\n";
+
+    // // Дадим воркеру время выполнить все задачи перед завершением программы.
+    // // Без этого `main` может закончиться, и деструктор менеджера
+    // // убьет воркер, не дав ему доделать работу.
+    // std::cout << "[Main] Ждем еще 6 секунд, чтобы все задачи точно выполнились...\n";
+    // std::this_thread::sleep_for(std::chrono::seconds(6));
+
+    // std::cout << "[Main] Программа завершается. Сейчас будет вызван деструктор менеджера.\n";
+    
+    // ATask Task;
+    
+    // Task = Custom_Task([]()-> STask_Awaiter { return { .Duration = 1 }; } );
+
+    // Task.Coroutine_Handle.resume();  // Do just once co_await
+
+    // auto lambda_callback_is_done = []()-> STask_Awaiter
+    // {
+        // std::cout << "Work done \n";
+        // return { .Duration = 1, .Func_To_Excecute = Func  };
+    // };
+
+    // AsTask_Manager::Get_Instance().Submit_Task(lambda_callback_is_done);
+
+    // std::this_thread::sleep_for(std::chrono::seconds(2) );
 }
 //------------------------------------------------------------------------------------------------------------
 
