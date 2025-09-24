@@ -1,5 +1,12 @@
 #-------------------------------------------------------------------------------------------------------------
-add_library(ALibrary_Dynamic SHARED src/lib_dynamic.cpp src/Task.cpp src/Task_Manager.cpp)   # Create a shared library
+add_library(ALibrary_Dynamic SHARED)
+
+target_sources(ALibrary_Dynamic PRIVATE
+    src/lib_dynamic.cpp
+    src/Task.cpp
+    src/Task_Manager.cpp
+    src/Task_Awaiter.cpp
+    )   # Create a shared library
 #-------------------------------------------------------------------------------------------------------------
 target_precompile_headers(ALibrary_Dynamic PRIVATE src/pch.h)  # Precompiled headers
 #-------------------------------------------------------------------------------------------------------------

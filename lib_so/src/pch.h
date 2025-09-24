@@ -13,4 +13,5 @@
 #include "lib_dynamic.h"
 #include "Task.h"
 #include "Task_Manager.h"
+#include "Task_Awaiter.h"
 //------------------------------------------------------------------------------------------------------------

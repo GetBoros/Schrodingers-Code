@@ -11,13 +11,13 @@ public:
     
     static AsTask_Manager &Get_Instance();
 
-    private:
+private:
     ~AsTask_Manager();
     AsTask_Manager(/* args */);
 
     void Worker_Loop();
 
-    bool Stop_Requested = false;
+    bool Is_Requests = false;
     std::vector<std::function<void()>> Task_Queue;
     std::mutex Queue_Mutex;
     std::condition_variable Condition_Var;
