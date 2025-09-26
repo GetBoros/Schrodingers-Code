@@ -1,6 +1,10 @@
 //------------------------------------------------------------------------------------------------------------
 #include "pch.h"
 //------------------------------------------------------------------------------------------------------------
+std::mutex mtx;
+std::condition_variable cv;
+bool go = true;
+//------------------------------------------------------------------------------------------------------------
 
 
 
@@ -37,6 +41,11 @@ ATask Coroutine_Task_3()
     co_return 3;
 }
 //------------------------------------------------------------------------------------------------------------
+bool &Get_Go()
+{
+    return go;
+}
+//------------------------------------------------------------------------------------------------------------
 
 
 
@@ -70,6 +79,25 @@ void ET_Coroutines()
     std::cout << "[Main] Программа завершается.\n";
 }
 //------------------------------------------------------------------------------------------------------------
+// void Thread_Func(std::stop_token token)
+// {
+    // std::unique_lock<std::mutex> lock(mtx);
+
+    // // 1.0. Condition to wait notification
+    // Get_Go() = false;  // Set to false
+    // cv.wait(lock, []{ return go; });  // wait if go == true and cv call cv.notify_one
+    // lock.unlock();
+
+    // // 1.1. Make some work if bool go == true
+    // std::cout << "[Поток " << std::this_thread::get_id() << "] Получил сигнал! Начинаю основную работу." << std::endl;
+    // while (token.stop_requested() != true)
+    // {
+        // std::cout << "[Поток " << std::this_thread::get_id() << "] ...работаю..." << std::endl;
+        // std::this_thread::sleep_for(std::chrono::seconds(2) );
+    // }
+    // std::cout << "[Поток " << std::this_thread::get_id() << "] Остановлен." << std::endl;
+// }
+//------------------------------------------------------------------------------------------------------------
 
 
 
@@ -77,6 +105,23 @@ void ET_Coroutines()
 // Main
 LIB_DYNAMIC_API void Func_Lib_Dynamic()
 {
-    // ET_Coroutines();
+    /*
+    std::jthread thread_worker(Thread_Func);
+
+    // 1.0. Wait untill mutex get free and try to change go(can do work) and after unlock
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(1) );  // not important
+
+        std::lock_guard<std::mutex> lock(mtx);
+        go = true;
+    }
+    
+    cv.notify_one();  // send signal
+
+    // 1.1. 
+    std::cout << "[Главный поток] Сигнал отправлен. Жду еще 6 секунд перед выходом." << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(6) );
+    std::cout << "[Главный поток] Завершаю работу. jthread автоматически остановит и присоединит рабочий поток." << std::endl;
+    */
 }
 //------------------------------------------------------------------------------------------------------------
