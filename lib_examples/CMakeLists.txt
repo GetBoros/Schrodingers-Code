@@ -1,13 +1,13 @@
 #-------------------------------------------------------------------------------------------------------------
-cmake_minimum_required(VERSION 3.28.3)
+add_library(ALib_Examples SHARED)  # Create a shared library
+
+target_sources(ALib_Examples PRIVATE
+        src/lib_examples.cpp
+    )
 #-------------------------------------------------------------------------------------------------------------
-project(ASchrodingers_Code VERSION 0.1) # Project name for IDE`s
+target_precompile_headers(ALib_Examples PRIVATE src/pch.h)  # Precompiled headers
 #-------------------------------------------------------------------------------------------------------------
-add_executable(AApplication src/main.cpp)
+target_compile_definitions(ALib_Examples PRIVATE BUILDING_LIB_EXAMPLES)
 #-------------------------------------------------------------------------------------------------------------
-target_link_libraries(AApplication PRIVATE
-    ALibrary
-    ALibrary_Dynamic
-    ALib_Examples
-    ) # Link the library to the executable
+target_include_directories(ALib_Examples PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)  # include directory library
 #-------------------------------------------------------------------------------------------------------------

@@ -1,15 +1,15 @@
 //------------------------------------------------------------------------------------------------------------
-#include <lib_examples.h>
+#pragma once
 //------------------------------------------------------------------------------------------------------------
-
-
-
-
+#if defined(_WIN32)
+    #if defined(BUILDING_LIB_EXAMPLES)
+        #define LIB_EXAMPLES_API __declspec(dllexport)
+    #else
+        #define LIB_EXAMPLES_API __declspec(dllimport)
+    #endif
+#else
+    #define LIB_EXAMPLES_API
+#endif
 //------------------------------------------------------------------------------------------------------------
-int main()
-{
-    FLib_Examples();
-
-    return 0;
-}
+LIB_EXAMPLES_API void FLib_Examples();
 //------------------------------------------------------------------------------------------------------------
