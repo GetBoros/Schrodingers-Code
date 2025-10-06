@@ -1,20 +1,24 @@
 //------------------------------------------------------------------------------------------------------------
-#pragma once
+#include "pch.h"
 //------------------------------------------------------------------------------------------------------------
-#include "lib_examples.h"
+class AObject
+{
+public:
+    virtual ~AObject();
+    AObject();
+
+    int Object_Param = 1;
+};
 //------------------------------------------------------------------------------------------------------------
-#include <iostream>
-#include <vector>
-#include <string>
-#include <chrono>
-#include <coroutine>
-#include <thread>
-#include <functional>
-#include <condition_variable>
+class AActor : public AObject
+{
+public:
+    int Actor_Param = 0;
+};
 //------------------------------------------------------------------------------------------------------------
-#include "Object.h"
-#include "Example_Task.h"
-#include "Task.h"
-#include "Task_Manager.h"
-#include "Task_Awaiter.h"
-//------------------------------------------------------------------------------------------------------------
+
+
+/*
+
+return (To*)Src;
+*/

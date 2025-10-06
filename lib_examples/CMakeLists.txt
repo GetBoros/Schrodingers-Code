@@ -3,6 +3,7 @@ add_library(ALib_Examples SHARED)  # Create a shared library
 
 target_sources(ALib_Examples PRIVATE
         src/lib_examples.cpp
+        src/Object.cpp
         src/Task.cpp
         src/Task_Manager.cpp
         src/Task_Awaiter.cpp
