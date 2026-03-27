@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------------------------------------
-#include "pch.h"
+#include <pch.h>
 //------------------------------------------------------------------------------------------------------------
 
 
@@ -8,16 +8,24 @@
 //------------------------------------------------------------------------------------------------------------
 LIB_EXAMPLES_API void FLib_Examples()
 {
-    int yy;
-    AActor *test;
-    AObject object;
+    // I(pronoun) compile(verb) code(noun)
+    APronoun pronoun_i, pronoun_compiler; 
 
-    object.Object_Param = 7;
+    // The(Allocator) strict(Adjective) compiler(noun) quickly(adverb) throws(verb) a(allocator) bug(noun)
+    // in(preposition) my(pronoun) code(noun).
 
-    test = (AActor *)&object;
-    yy = test->Object_Param;
+    const char *allocator;
+    const char *adjective;
+    const char *noun;
+    const char *adverb;
+    const char *verb;
+    const char *arr = "The strict compiler quickly throws a bug in my code.";
 
-    yy++;
-    
+    allocator = &arr[0];
+    adjective = &arr[0 + 4];
+    noun = &arr[4 + 7];  // compiler
+    adverb = &arr[11 + 9];  // quickly
+    verb = &arr[20 + 8];  // throws
+
 }
 //------------------------------------------------------------------------------------------------------------

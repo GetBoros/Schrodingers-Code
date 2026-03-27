@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------------------------------------
-cmake_minimum_required(VERSION 3.28.3)
+cmake_minimum_required(VERSION 4.3.0)
 #-------------------------------------------------------------------------------------------------------------
 project(ASchrodingers_Code VERSION 0.1) # Project name for IDE`s
 #-------------------------------------------------------------------------------------------------------------
@@ -10,4 +10,6 @@ target_link_libraries(AApplication PRIVATE
     ALibrary_Dynamic
     ALib_Examples
     ) # Link the library to the executable
+#-------------------------------------------------------------------------------------------------------------
+target_include_directories(AApplication PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)  # include directory library
 #-------------------------------------------------------------------------------------------------------------
