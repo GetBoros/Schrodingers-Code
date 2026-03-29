@@ -12,9 +12,9 @@
 #include <functional>
 #include <condition_variable>
 //------------------------------------------------------------------------------------------------------------
-#include "Object.h"
-#include "Example_Task.h"
-#include "Task.h"
-#include "Task_Manager.h"
-#include "Task_Awaiter.h"
+#include <Lib_Examples/Object.h>
+#include <Lib_Examples/Example_Task.h>
+#include <Lib_Examples/Task.h>
+#include <Lib_Examples/Task_Manager.h>
+#include <Lib_Examples/Task_Awaiter.h>
 //------------------------------------------------------------------------------------------------------------

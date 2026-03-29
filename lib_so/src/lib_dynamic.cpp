@@ -8,19 +8,13 @@
 // Main
 LIB_DYNAMIC_API void Func_Lib_Dynamic()
 {
-    constexpr AExample_Constexpr test(10);
-    AExample_Constexpr test_runtime(10);
+    constexpr AExample_Constexpr example_constexpr(10);
+    AExample_Constexpr example_constexpr_runtime(10);
 
-    static_assert(test.Constexpr_Value == 10);
-    static_assert(test.get_info() == 20);
-    if (test_runtime.get_info() == 20)
-    {
-        int yy;
-
-        yy = 0;
-
-        yy++;
-    }
+    static_assert(example_constexpr.Constexpr_Value == 10);
+    static_assert(example_constexpr.get_info() == 20);
+    if (example_constexpr_runtime.get_info() == 20)
+        return;
     
     // FLib_Examples();
 }
