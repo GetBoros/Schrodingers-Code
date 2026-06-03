@@ -10,7 +10,7 @@ public:
 
     }
 
-    constexpr int get_info() const
+    constexpr int Example_Constexpr_Info() const
     {
         return Constexpr_Value + 10;  // Logic Example
     }

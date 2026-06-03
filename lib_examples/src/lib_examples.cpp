@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------------------------------------
 #include <Lib_Examples/lib_examples.h>
-#include <Lib_Examples/Example_Constexpr.hpp>
+// #include <Lib_Examples/Example_Constexpr.hpp>
+#include <Lib_Examples/Example_Clicker.h>
 //------------------------------------------------------------------------------------------------------------
 
 
@@ -9,13 +10,17 @@
 //------------------------------------------------------------------------------------------------------------
 LIB_EXAMPLES_API void FLib_Examples()
 {
-    constexpr AExample_Constexpr example_constexpr(10);
-    AExample_Constexpr example_constexpr_runtime(10);
+    AExample_Clicker example_clicker;
+    
+    example_clicker.Init();
 
-    static_assert(example_constexpr.Constexpr_Value == 10);
-    static_assert(example_constexpr.get_info() == 20);
-    if (example_constexpr_runtime.get_info() == 20)
-        return;
+    // constexpr AExample_Constexpr example_constexpr(10);
+    // AExample_Constexpr example_constexpr_runtime(10);
+// 
+    // static_assert(example_constexpr.Constexpr_Value == 10);
+    // static_assert(example_constexpr.Example_Constexpr_Info() == 20);
+    // if (example_constexpr_runtime.Example_Constexpr_Info() == 20)
+    //     return;
     
 
     // I(pronoun) compile(verb) code(noun)

@@ -1,25 +1,15 @@
 //------------------------------------------------------------------------------------------------------------
 #include <Lib_Examples/Task_Manager.h>
 //------------------------------------------------------------------------------------------------------------
-// Публичный метод для добавления задач
-void AsTask_Manager::Submit_Task(std::function<void()> task_function)
-{
-    {
-        std::unique_lock<std::mutex> lock(Queue_Mutex);  // Блокируем мьютекс, чтобы безопасно добавить задачу в очередь
-        std::cout << "[Main] -> Добавляю новую задачу в очередь.\n";
-        Task_Queue.push_back(std::move(task_function));
-    }
 
-    Condition_Var.notify_one();  // "Будим" наш воркер, чтобы он проверил очередь
-}
-//------------------------------------------------------------------------------------------------------------
-AsTask_Manager &AsTask_Manager::Get_Instance()
-{
-    static AsTask_Manager instance;
 
-    return instance;
-}
-//------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+// AsTask_Manager
 AsTask_Manager::~AsTask_Manager()
 {
     std::cout << "[Manager] Деструктор: Запрашиваю остановку воркера...\n";
@@ -37,11 +27,29 @@ AsTask_Manager::~AsTask_Manager()
     std::cout << "[Manager] Воркер остановлен. Менеджер уничтожен.\n";
 }
 //------------------------------------------------------------------------------------------------------------
-AsTask_Manager::AsTask_Manager(/* args */)
+AsTask_Manager::AsTask_Manager()
 {
     std::cout << "[Manager] Конструктор: Запускаю поток-воркер...\n";
 
     Worker_Thread = std::thread(&AsTask_Manager::Worker_Loop, this);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsTask_Manager::Submit_Task(std::function<void()> task_function)
+{
+    {
+        std::unique_lock<std::mutex> lock(Queue_Mutex);  // Блокируем мьютекс, чтобы безопасно добавить задачу в очередь
+        std::cout << "[Main] -> Добавляю новую задачу в очередь.\n";
+        Task_Queue.push_back(std::move(task_function) );
+    }
+
+    Condition_Var.notify_one();  // "Будим" наш воркер, чтобы он проверил очередь
+}
+//------------------------------------------------------------------------------------------------------------
+AsTask_Manager &AsTask_Manager::Get_Instance()
+{
+    static AsTask_Manager instance;
+
+    return instance;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsTask_Manager::Worker_Loop()

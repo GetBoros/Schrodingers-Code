@@ -8,6 +8,7 @@ target_sources(ALib_Examples PRIVATE
         src/Task_Manager.cpp
         src/Task_Awaiter.cpp
         src/Example_Task.cpp
+        src/Example_Clicker.cpp
     )
 #-------------------------------------------------------------------------------------------------------------
 target_precompile_headers(ALib_Examples PRIVATE public/Lib_Examples/pch.h)  # Precompiled headers
