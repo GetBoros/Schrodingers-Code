@@ -7,6 +7,10 @@ public:
     void Init();
 
 private:
-    void Emit(int fd, int type, int code, int val);
+    bool Is_Mouse_With_Wheel(int fd);
+
+    void Hold_Mouse(int uinput_fd, bool is_press);
+    int Create_Virtual_Mouse();
+    
 };
 //------------------------------------------------------------------------------------------------------------
