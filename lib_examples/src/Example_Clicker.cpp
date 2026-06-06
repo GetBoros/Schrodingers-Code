@@ -104,6 +104,7 @@ void AExample_Clicker::Init()
     ioctl(uinput_fd, UI_DEV_DESTROY);
     close(uinput_fd);
     close(mouse_fd);
+
     std::cout << "Программа завершена." << std::endl;
 
     return;
@@ -112,16 +113,21 @@ void AExample_Clicker::Init()
 bool AExample_Clicker::Is_Mouse_With_Wheel(int fd)
 {
     unsigned char evtype_bitmask[EV_MAX/8 + 1];
+    unsigned char rel_bitmask[REL_MAX/8 + 1];
+
     memset(evtype_bitmask, 0, sizeof(evtype_bitmask) );
     
     // Получаем список того, что умеет устройство
-    if (ioctl(fd, EVIOCGBIT(0, sizeof(evtype_bitmask) ), evtype_bitmask) < 0) return false;
+    if (ioctl(fd, EVIOCGBIT(0, sizeof(evtype_bitmask) ), evtype_bitmask) < 0)
+        return false;
 
     // Проверяем, поддерживает ли оно относительные оси (EV_REL) - мышки работают через них
-    if (evtype_bitmask[EV_REL / 8] & (1 << (EV_REL % 8) ) ) {
-        unsigned char rel_bitmask[REL_MAX/8 + 1];
+    if (evtype_bitmask[EV_REL / 8] & (1 << (EV_REL % 8) ) )
+     {
         memset(rel_bitmask, 0, sizeof(rel_bitmask) );
-        if (ioctl(fd, EVIOCGBIT(EV_REL, sizeof(rel_bitmask) ), rel_bitmask) < 0) return false;
+        
+        if (ioctl(fd, EVIOCGBIT(EV_REL, sizeof(rel_bitmask) ), rel_bitmask) < 0)
+            return false;
 
         // Проверяем, есть ли именно колесико (REL_WHEEL)
         if (rel_bitmask[REL_WHEEL / 8] & (1 << (REL_WHEEL % 8) ) ) {
@@ -158,15 +164,16 @@ void AExample_Clicker::Hold_Mouse(int uinput_fd, bool is_press)
 int AExample_Clicker::Create_Virtual_Mouse()
 {
     int fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
+    struct uinput_user_dev uud;
+
     if (fd < 0)
         return -1;
 
     ioctl(fd, UI_SET_EVBIT, EV_KEY);
-    ioctl(fd, UI_SET_KEYBIT, BTN_LEFT); // Наша вирт. мышь умеет только кликать ЛКМ
-
-    struct uinput_user_dev uud;
+    ioctl(fd, UI_SET_KEYBIT, BTN_LEFT);  // Наша вирт. мышь умеет только кликать ЛКМ
     memset(&uud, 0, sizeof(uud) );
     snprintf(uud.name, UINPUT_MAX_NAME_SIZE, "Virtual Clicker");
+
     uud.id.bustype = BUS_USB;
     uud.id.vendor  = 0x1234;
     uud.id.product = 0x5678;
@@ -175,7 +182,7 @@ int AExample_Clicker::Create_Virtual_Mouse()
     write(fd, &uud, sizeof(uud) );
     ioctl(fd, UI_DEV_CREATE);
     
-    sleep(1); // Ждем, пока система распознает устройство
+    sleep(1);  // Ждем, пока система распознает устройство
     
     return fd;
 }
