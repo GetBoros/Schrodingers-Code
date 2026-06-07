@@ -24,16 +24,3 @@
 #include <Lib_Examples/Task_Manager.h>
 #include <Lib_Examples/Task_Awaiter.h>
 //------------------------------------------------------------------------------------------------------------
-namespace Platform {
-#ifdef __linux__
-    inline constexpr bool IsLinux = true;
-    inline constexpr bool IsWindows = false;
-#elif _WIN32
-    inline constexpr bool IsLinux = false;
-    inline constexpr bool IsWindows = true;
-#else
-    inline constexpr bool IsLinux = false;
-    inline constexpr bool IsWindows = false;
-#endif
-}
-//------------------------------------------------------------------------------------------------------------

@@ -10,10 +10,10 @@
 //------------------------------------------------------------------------------------------------------------
 LIB_EXAMPLES_API void FLib_Examples()
 {
-    if constexpr (Platform::IsLinux == true)
+     if constexpr (Platform::IsLinux) 
     {
+        // Этот блок компилятор Windows просто проигнорирует при сборке
         AExample_Clicker example_clicker;
-        
         example_clicker.Init();
     }
 
