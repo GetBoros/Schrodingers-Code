@@ -10,9 +10,12 @@
 //------------------------------------------------------------------------------------------------------------
 LIB_EXAMPLES_API void FLib_Examples()
 {
-    AExample_Clicker example_clicker;
-    
-    example_clicker.Init();
+    if constexpr (Platform::IsLinux == true)
+    {
+        AExample_Clicker example_clicker;
+        
+        example_clicker.Init();
+    }
 
     // constexpr AExample_Constexpr example_constexpr(10);
     // AExample_Constexpr example_constexpr_runtime(10);
