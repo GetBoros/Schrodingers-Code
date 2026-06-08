@@ -1,7 +1,6 @@
 //------------------------------------------------------------------------------------------------------------
 #include <Lib_Examples/lib_examples.h>
 // #include <Lib_Examples/Example_Constexpr.hpp>
-#include <Lib_Examples/Example_Clicker.h>
 //------------------------------------------------------------------------------------------------------------
 
 
@@ -10,13 +9,6 @@
 //------------------------------------------------------------------------------------------------------------
 LIB_EXAMPLES_API void FLib_Examples()
 {
-     if constexpr (Platform::IsLinux) 
-    {
-        // Этот блок компилятор Windows просто проигнорирует при сборке
-        AExample_Clicker example_clicker;
-        example_clicker.Init();
-    }
-
     // constexpr AExample_Constexpr example_constexpr(10);
     // AExample_Constexpr example_constexpr_runtime(10);
 // 
