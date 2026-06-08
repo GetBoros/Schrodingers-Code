@@ -16,7 +16,6 @@
 //------------------------------------------------------------------------------------------------------------
 #include "lib_examples.h"
 //------------------------------------------------------------------------------------------------------------
-#include <Lib_Examples/Object.h>
 #include <Lib_Examples/Example_Task.h>
 #include <Lib_Examples/Task.h>
 #include <Lib_Examples/Task_Manager.h>
